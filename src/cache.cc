@@ -14,7 +14,7 @@ void CACHE::handle_fill()
 
     if (MSHR.next_fill_cycle <= current_core_cycle[fill_cpu]) {
 
-#ifdef SANITY_CHECK
+#ifdef SANITY_CHECK //_UME_sanity_checked
         if (MSHR.next_fill_index >= MSHR.SIZE)
             assert(0);
 #endif

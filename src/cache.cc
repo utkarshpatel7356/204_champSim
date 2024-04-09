@@ -1057,7 +1057,9 @@ void CACHE::operate()
 
 uint32_t CACHE::get_set(uint64_t address)
 {
-    return (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1)); 
+    int val = (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1));
+    CACHE::hotness[val]++;
+    return val;
 }
 
 uint32_t CACHE::get_way(uint64_t address, uint32_t set)

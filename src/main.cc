@@ -1,5 +1,5 @@
 #define _BSD_SOURCE
-//UTK_line 74 _added print_access function
+//UTK_line 74 _added print_access function and printed the evicitons of a particular set
 // UTK line 80 _called print_acces function in main
 #include <getopt.h>
 #include "ooo_cpu.h"
@@ -73,9 +73,9 @@ void print_roi_stats(uint32_t cpu, CACHE *cache)
     //cout << " AVERAGE MISS LATENCY: " << (cache->total_miss_latency)/TOTAL_MISS << " cycles " << cache->total_miss_latency << "/" << TOTAL_MISS<< endl;
 }
 void print_access( CACHE *cache){
-	cout << "HOTNESS" << endl;
+	cout << "ACCESSES AND EVICTIONS" << endl;
 	for(int i=0;i<2048;i++){
-		cout << "set " << i << "::" << cache->access[i] << endl;
+		cout << "set " << i << "\t\t::" << cache->access[i]<<"\t\t" << cache->evictions[i] << endl;
 	}
 }
 void print_sim_stats(uint32_t cpu, CACHE *cache)

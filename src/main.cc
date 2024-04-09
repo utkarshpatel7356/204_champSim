@@ -1,5 +1,6 @@
 #define _BSD_SOURCE
-
+//UTK_line 74 _added print_access function
+// UTK line 80 _called print_acces function in main
 #include <getopt.h>
 #include "ooo_cpu.h"
 #include "uncore.h"
@@ -17,6 +18,7 @@ uint64_t warmup_instructions     = 1000000,
          simulation_instructions = 10000000,
          champsim_seed;
 
+		
 time_t start_time;
 
 // PAGE TABLE
@@ -24,6 +26,9 @@ uint32_t PAGE_TABLE_LATENCY = 0, SWAP_LATENCY = 0;
 queue <uint64_t > page_queue;
 map <uint64_t, uint64_t> page_table, inverse_table, recent_page, unique_cl[NUM_CPUS];
 uint64_t previous_ppage, num_adjacent_page, num_cl[NUM_CPUS], allocated_pages, num_page[NUM_CPUS], minor_fault[NUM_CPUS], major_fault[NUM_CPUS];
+
+
+
 
 void record_roi_stats(uint32_t cpu, CACHE *cache)
 {
@@ -67,16 +72,12 @@ void print_roi_stats(uint32_t cpu, CACHE *cache)
     cout << " AVERAGE MISS LATENCY: " << (1.0*(cache->total_miss_latency))/TOTAL_MISS << " cycles" << endl;
     //cout << " AVERAGE MISS LATENCY: " << (cache->total_miss_latency)/TOTAL_MISS << " cycles " << cache->total_miss_latency << "/" << TOTAL_MISS<< endl;
 }
-
-void print_hotness(CACHE *cache) {
-    
-    cout << cache->NAME << " HOTNESS" << endl;
-
-    for(int i = 0; i < 2048; i++) {
-        cout << "Set " << i << " " << cache->hotness[i] << endl;
-    }
+void print_access( CACHE *cache){
+	cout << "HOTNESS" << endl;
+	for(int i=0;i<2048;i++){
+		cout << "set " << i << "::" << cache->access[i] << endl;
+	}
 }
-
 void print_sim_stats(uint32_t cpu, CACHE *cache)
 {
     uint64_t TOTAL_ACCESS = 0, TOTAL_HIT = 0, TOTAL_MISS = 0;
@@ -960,7 +961,6 @@ int main(int argc, char** argv)
 #endif
         print_roi_stats(i, &uncore.LLC);
         cout << "Major fault: " << major_fault[i] << " Minor fault: " << minor_fault[i] << endl;
-        print_hotness(&uncore.LLC);
     }
 
     for (uint32_t i=0; i<NUM_CPUS; i++) {
@@ -976,7 +976,7 @@ int main(int argc, char** argv)
     print_dram_stats();
     print_branch_stats();
 #endif
-
-
+	//UTK_printing the number of accesses of a prticular set while running
+	print_access(&uncore.LLC);
     return 0;
 }

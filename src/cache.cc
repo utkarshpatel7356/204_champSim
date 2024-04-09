@@ -1,14 +1,14 @@
-//_UTK_comment
+//_UTK_comment_line 1060_in get_set()_found number of accesses and evictions of a prticular set
 //_UTK_commit
+#include <iostream>
 #include "cache.h"
 #include "set.h"
-
 uint64_t l2pf_access = 0;
-
 void CACHE::handle_fill()
 {
     // handle fill
     uint32_t fill_cpu = (MSHR.next_fill_index == MSHR_SIZE) ? NUM_CPUS : MSHR.entry[MSHR.next_fill_index].cpu;
+    //cout << fill_cpu << endl; UTK_tested the CPU numbers got 10 million 1's and 0's
     if (fill_cpu == NUM_CPUS)
         return;
 
@@ -24,6 +24,7 @@ void CACHE::handle_fill()
         // find victim
         uint32_t set = get_set(MSHR.entry[mshr_index].address), way;
         if (cache_type == IS_LLC) {
+        	evictions[set]++;
             way = llc_find_victim(fill_cpu, MSHR.entry[mshr_index].instr_id, set, block[set], MSHR.entry[mshr_index].ip, MSHR.entry[mshr_index].full_addr, MSHR.entry[mshr_index].type);
         }
         else
@@ -1046,8 +1047,8 @@ void CACHE::handle_prefetch()
 
 void CACHE::operate()
 {
-    handle_fill();
-    handle_writeback();
+    handle_fill();//UTK_menory to CACHE using MSHR
+    handle_writeback();//UTK_write to memory using WQ
     reads_available_this_cycle = MAX_READ;
     handle_read();
 
@@ -1057,9 +1058,11 @@ void CACHE::operate()
 
 uint32_t CACHE::get_set(uint64_t address)
 {
-    int val = (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1));
-    CACHE::hotness[val]++;
-    return val;
+	//UTK_trying to count the number of times a particular set is accessed
+	uint32_t val= (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1));
+	access[val]++;
+	return val;
+    //return (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1)); //UTK_commented out
 }
 
 uint32_t CACHE::get_way(uint64_t address, uint32_t set)
@@ -1750,6 +1753,7 @@ uint32_t CACHE::get_size(uint8_t queue_type, uint64_t address)
 
     return 0;
 }
+
 
 void CACHE::increment_WQ_FULL(uint64_t address)
 {

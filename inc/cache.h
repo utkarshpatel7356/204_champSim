@@ -114,6 +114,7 @@ class CACHE : public MEMORY {
              //UTK_array for counting the access count of a prticular set
              access[2048],//UTK
              evictions[2048],
+             evictions_count,
              roi_hit[NUM_CPUS][NUM_TYPES],
              roi_miss[NUM_CPUS][NUM_TYPES];
 
@@ -178,10 +179,14 @@ class CACHE : public MEMORY {
 
     void return_data(PACKET *packet),
          operate(),
-         increment_WQ_FULL(uint64_t address);
+         increment_WQ_FULL(uint64_t address),
+         print_evictions();
+
+         
 
     uint32_t get_occupancy(uint8_t queue_type, uint64_t address),
              get_size(uint8_t queue_type, uint64_t address);
+             
 
     int  check_hit(PACKET *packet),
          invalidate_entry(uint64_t inval_addr),
@@ -193,6 +198,7 @@ class CACHE : public MEMORY {
          handle_writeback(),
          handle_read(),
          handle_prefetch();
+    
 
     void add_mshr(PACKET *packet),
          update_fill_cycle(),

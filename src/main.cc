@@ -1,5 +1,5 @@
 #define _BSD_SOURCE
-//UTK_line 74 _added print_access function and printed the evicitons of a particular set
+//UTK_line 74 _added print_access function and printed the evicitons of a prticular set
 // UTK line 80 _called print_acces function in main
 #include <getopt.h>
 #include "ooo_cpu.h"
@@ -77,6 +77,7 @@ void print_access( CACHE *cache){
 	for(int i=0;i<2048;i++){
 		cout << "set " << i << "\t\t::" << cache->access[i]<<"\t\t" << cache->evictions[i] << endl;
 	}
+    cout<< "TOTAL_EVICTIONS:" << cache->evictions_count << endl;
 }
 void print_sim_stats(uint32_t cpu, CACHE *cache)
 {

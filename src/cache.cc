@@ -1,6 +1,9 @@
 //_UTK_comment_line 1060_in get_set()_found number of accesses and evictions of a prticular set
 //_UTK_commit
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <utility>
 #include "cache.h"
 #include "set.h"
 uint64_t l2pf_access = 0;
@@ -24,8 +27,14 @@ void CACHE::handle_fill()
         // find victim
         uint32_t set = get_set(MSHR.entry[mshr_index].address), way;
         if (cache_type == IS_LLC) {
-        	if(warmup_complete[fill_cpu]){evictions[set]++;
+        	if(warmup_complete[fill_cpu]){
+          evictions[set]++;
+          temp_evictions[set]++;
           evictions_count++;
+          if(evictions_count % 1000 == 0){
+            cout << "Eviction count: " << evictions_count << endl;
+            print_evictions();
+          }
           //if evictions are crossing a certain threshold 
         }
             way = llc_find_victim(fill_cpu, MSHR.entry[mshr_index].instr_id, set, block[set], MSHR.entry[mshr_index].ip, MSHR.entry[mshr_index].full_addr, MSHR.entry[mshr_index].type);
@@ -407,6 +416,11 @@ void CACHE::handle_writeback()
                     way = llc_find_victim(writeback_cpu, WQ.entry[index].instr_id, set, block[set], WQ.entry[index].ip, WQ.entry[index].full_addr, WQ.entry[index].type);
                         if(warmup_complete[writeback_cpu]){evictions[set]++;
                         evictions_count++;
+                        temp_evictions[set]++;
+                        if(evictions_count % 1000 == 0){
+                          cout << "Eviction count: " << evictions_count << endl;
+                          print_evictions();
+                        }
                         //if evictions are crossing a certain threshold 
                       }
                 }
@@ -1068,6 +1082,10 @@ uint32_t CACHE::get_set(uint64_t address)
 	//UTK_trying to count the number of times a particular set is accessed
 	uint32_t val= (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1));
 	access[val]++;
+  if(cache_type == IS_LLC)
+    {
+      if(redirect_lookup.find(val) != redirect_lookup.end()) return redirect_lookup[val];
+    }
 	return val;
     //return (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1)); //UTK_commented out
 }
@@ -1760,11 +1778,15 @@ uint32_t CACHE::get_size(uint8_t queue_type, uint64_t address)
 
     return 0;
 }
+
+bool sortBySecond(const std::pair<int, uint64_t> &a, const std::pair<int, uint64_t> &b) {
+    return a.second < b.second;
+}
 void CACHE::print_set_type(){
     vector<pair<int,int>>v;
-    for(auto it:evictions)
+    for(int i=0;i<2048;i++)
     {
-         v.push_back(make_pair(evictions.second,evictions.first));
+         v.push_back(make_pair(evictions[i],i));
 
     }
     sort(v.begin(),v.end());
@@ -1789,8 +1811,81 @@ void CACHE::print_set_type(){
     }
 }
 
-void CACHE::print_evictions(){
-  
+void CACHE::print_evictions() {
+    std::vector<std::pair<int, uint64_t>> classification;
+    for(int i = 0; i < 2048; i++) {
+        classification.push_back(std::make_pair(i, evictions[i]));
+    }
+
+    // Sort the vector using the custom comparator
+    std::sort(classification.begin(), classification.end(), sortBySecond);
+    for (int i = 0; i < 512; i++) {
+            overall_eviction_map[classification[i].first] += "1";
+        }
+        for(int i = 512; i < 1024; i++) {
+            overall_eviction_map[classification[i].first] += "2";
+        }
+        for(int i = 1024; i < 1536; i++) {
+            overall_eviction_map[classification[i].first] += "3";
+        }
+        for(int i = 1536; i < 2048; i++) {
+            overall_eviction_map[classification[i].first] += "4";
+        }
+    // Now 'classification' is sorted according to the second element of each pair.
+    // You can use it for further processing or printing.
+//     cout << "VERY COLD: " << endl;
+//     for(int i=0;i<512;i++){
+//         cout << classification[i].first << " " << classification[i].second << endl;
+//     }
+//     cout << "COLD: " << endl;
+//     for(int i=512;i<1024;i++){
+//         cout << classification[i].first << " " << classification[i].second << endl;
+//     }
+//     cout << "HOT:" << endl;
+//     for(int i=1024;i<1536;i++){
+//         cout << classification[i].first << " " << classification[i].second << endl;
+//     }
+//     cout << "VERY HOT:" << endl;
+//     for(int i=1536;i<2048;i++){
+//         cout << classification[i].first << " " << classification[i].second << endl;
+//     }
+        // cout << "VERY COLD: \t COLD: \t HOT: \t VERY HOT: " << endl;
+        // for(int i=0;i<512;i++){
+        //     cout << classification[i].first<<" " << classification[i].second << "\t";
+        //     cout << classification[i+512].first<<" " << classification[i+512].second << "\t";
+        //     cout << classification[i+1024].first<<" " << classification[i+1024].second << "\t";
+        //     cout << classification[i+1536].first<<" " << classification[i+1536].second << "\t";
+        //     cout << endl;
+        // }
+        std::vector<std::pair<int, uint64_t>> classification1;
+    for(int i = 0; i < 2048; i++) {
+        classification1.push_back(std::make_pair(i, temp_evictions[i]));
+    }
+
+    // Sort the vector using the custom comparator
+    std::sort(classification1.begin(), classification1.end(), sortBySecond);
+        for (int i = 0; i < 512; i++) {
+            eviction_map[classification1[i].first] += "1";
+        }
+        for(int i = 512; i < 1024; i++) {
+            eviction_map[classification1[i].first] += "2";
+        }
+        for(int i = 1024; i < 1536; i++) {
+            eviction_map[classification1[i].first] += "3";
+        }
+        for(int i = 1536; i < 2048; i++) {
+            eviction_map[classification1[i].first] += "4";
+        }
+        for(int i=0;i<1024;i++){
+            redirect_lookup[classification1[2047-i].first]=classification1[i].first;
+        }
+        for(int i=0;i<2048;i++){
+          temp_evictions[i]=0;
+        }
+        //print eviction map
+        for(auto it = redirect_lookup.begin(); it != redirect_lookup.end(); it++) {
+            cout << it->first << " " << it->second << endl;
+        }
 }
 void CACHE::increment_WQ_FULL(uint64_t address)
 {

@@ -78,6 +78,9 @@ void print_access( CACHE *cache){
 		cout << "set " << i << "\t\t::" << cache->access[i]<<"\t\t" << cache->evictions[i] << endl;
 	}
     cout<< "TOTAL_EVICTIONS:" << cache->evictions_count << endl;
+    for(int i=0;i<2048;i++){
+        cout << i <<" "<<cache->eviction_map[i] << " "<< cache->overall_eviction_map[i]<<endl;
+    }
 }
 void print_sim_stats(uint32_t cpu, CACHE *cache)
 {

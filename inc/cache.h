@@ -2,7 +2,7 @@
 //UTK _ added an arry for count evictions in a particular set
 #ifndef CACHE_H
 #define CACHE_H
-
+#include <map>
 #include "memory_class.h"
 
 // PAGE
@@ -114,10 +114,14 @@ class CACHE : public MEMORY {
              //UTK_array for counting the access count of a prticular set
              access[2048],//UTK
              evictions[2048],
+             temp_evictions[2048],//UTK
              evictions_count,
              roi_hit[NUM_CPUS][NUM_TYPES],
              roi_miss[NUM_CPUS][NUM_TYPES];
-
+    string eviction_map[2048];
+    string overall_eviction_map[2048];//UTK
+    map<int,int> redirect_lookup;
+    //UTK_END_check accesses
     uint64_t total_miss_latency;
     
     // constructor
@@ -180,8 +184,8 @@ class CACHE : public MEMORY {
     void return_data(PACKET *packet),
          operate(),
          increment_WQ_FULL(uint64_t address),
-         print_evictions();
-
+         print_evictions(),
+         print_set_type();
          
 
     uint32_t get_occupancy(uint8_t queue_type, uint64_t address),

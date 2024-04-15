@@ -1084,15 +1084,15 @@ uint32_t CACHE::get_set_1(uint64_t address)
 
 uint32_t CACHE::get_set_2(uint64_t address)
 {
-    return (uint32_t) (address >> 5 & ((1 << lg2(NUM_SET)) - 1)); 
+    return (uint32_t) (address >> 2 & ((1 << lg2(NUM_SET)) - 1)); 
 }
 uint32_t CACHE::get_set_3(uint64_t address)
 {
-    return (uint32_t) (address >> 10 & ((1 << lg2(NUM_SET)) - 1)); 
+    return (uint32_t) (address >> 3 & ((1 << lg2(NUM_SET)) - 1)); 
 }
 uint32_t CACHE::get_set_4(uint64_t address)
 {
-    return (uint32_t) (address >> 15 & ((1 << lg2(NUM_SET)) - 1)); 
+    return (uint32_t) (address >> 4 & ((1 << lg2(NUM_SET)) - 1)); 
 }
 uint32_t CACHE::get_way(uint64_t address, uint32_t set)
 {
@@ -1198,7 +1198,7 @@ std::pair<int,int> CACHE::check_hit(PACKET *packet)
         if(way != -1) {heat[set2]++; return std::make_pair(set2, way);}
     }
 
-    if(way != -1) heat[set]+=2;
+    if(way != -1) heat[set]++;
 
     return std::make_pair(set, way);
 }

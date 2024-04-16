@@ -1837,26 +1837,26 @@ void CACHE::print_set_type(){
     sort(v.begin(),v.end());
     int i=v.size()-1;
     int j=512;
-    while(j--)
+    while(j-- && i>=0)
     {
        cout<<"Set"<<v[i].second<<" Very hot set\n";
        i--;
     }
     j=512;
-    while(j--)
+    while(j-- && i>=0)
     {
        cout<<"Set"<<v[i].second<<" Hot set\n";
        i--;
     }
     j=1024;
-    while(j--)
+    while(j-- && i>=0)
     {
        cout<<"Set"<<v[i].second<<" Cold set\n";
        i--;
     }
 }
 
-
+//Comparing second element of vector with pair.
 bool sortBySecond(const std::pair<int, uint64_t> &a, const std::pair<int, uint64_t> &b) {
     return a.second < b.second;
 }
@@ -1881,32 +1881,7 @@ void CACHE::print_evictions() {
         for(int i = 1536; i < 2048; i++) {
             overall_eviction_map[classification[i].first] += "4";
         }
-    // Now 'classification' is sorted according to the second element of each pair.
-    // You can use it for further processing or printing.
-//     cout << "VERY COLD: " << endl;
-//     for(int i=0;i<512;i++){
-//         cout << classification[i].first << " " << classification[i].second << endl;
-//     }
-//     cout << "COLD: " << endl;
-//     for(int i=512;i<1024;i++){
-//         cout << classification[i].first << " " << classification[i].second << endl;
-//     }
-//     cout << "HOT:" << endl;
-//     for(int i=1024;i<1536;i++){
-//         cout << classification[i].first << " " << classification[i].second << endl;
-//     }
-//     cout << "VERY HOT:" << endl;
-//     for(int i=1536;i<2048;i++){
-//         cout << classification[i].first << " " << classification[i].second << endl;
-//     }
-        // cout << "VERY COLD: \t COLD: \t HOT: \t VERY HOT: " << endl;
-        // for(int i=0;i<512;i++){
-        //     cout << classification[i].first<<" " << classification[i].second << "\t";
-        //     cout << classification[i+512].first<<" " << classification[i+512].second << "\t";
-        //     cout << classification[i+1024].first<<" " << classification[i+1024].second << "\t";
-        //     cout << classification[i+1536].first<<" " << classification[i+1536].second << "\t";
-        //     cout << endl;
-        // }
+    
         std::vector<std::pair<int, uint64_t>> classification1;
     for(int i = 0; i < 2048; i++) {
         classification1.push_back(std::make_pair(i, temp_evictions[i]));

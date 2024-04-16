@@ -1848,10 +1848,16 @@ void CACHE::print_set_type(){
        cout<<"Set"<<v[i].second<<" Hot set\n";
        i--;
     }
-    j=1024;
+    j=512;
     while(j-- && i>=0)
     {
        cout<<"Set"<<v[i].second<<" Cold set\n";
+       i--;
+    }
+    j=512;
+    while(j-- && i>=0)
+    {
+       cout<<"Set"<<v[i].second<<" Very cold set\n";
        i--;
     }
 }

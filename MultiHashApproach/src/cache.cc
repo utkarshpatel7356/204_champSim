@@ -1063,7 +1063,7 @@ uint32_t CACHE::get_set(uint64_t address)
 {
     uint32_t val = (uint32_t) (address & ((1 << lg2(NUM_SET)) - 1));
 
-    if(cache_type == IS_LLC && warmup_complete[cpu]) {
+    if(cache_type == IS_LLC) {
         uint32_t val2 = get_set_2(address);
         if(heat[val] > heat[val2]) val = val2;
         val2 = get_set_3(address);
@@ -1186,7 +1186,7 @@ std::pair<int,int> CACHE::check_hit(PACKET *packet)
 
     int way = find(set, packet);
 
-    if(cache_type == IS_LLC && warmup_complete[cpu] && way == -1) {
+    if(cache_type == IS_LLC && way == -1) {
         uint32_t set2 = get_set_2(packet->address);
         way = find(set2, packet);
         if(way != -1) {heat[set2]++; return std::make_pair(set2, way);}

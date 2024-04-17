@@ -853,7 +853,7 @@ void CACHE::handle_read()
 	  {
 	    return;
 	  }
-e
+
 	if(reads_available_this_cycle == 0)
 	  {
 	    return;

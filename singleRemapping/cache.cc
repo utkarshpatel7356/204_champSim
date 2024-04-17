@@ -1,6 +1,6 @@
-#define START 12000
-#define REMAP 14000
-#define TOMAP 512
+#define START 0
+#define REMAP 10000
+#define TOMAP 1024
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -32,7 +32,7 @@ void CACHE::handle_fill()
               if(evictions_count >=START){
                   temp_evictions[evict_set]++;
               }
-              if(evictions_count == REMAP){
+              if(evictions_count == REMAP ){
                   do_remapping();
               }
         }
@@ -1868,9 +1868,6 @@ void CACHE::do_remapping() {
     std::sort(classification.begin(), classification.end(), sortBySecond);
     for(int i=0;i<TOMAP;i++){
         redirect_lookup[classification[2047-i].first]=classification[i].first;
-    }
-    for(int i=0;i<TOMAP;i++){
-        redirect_lookup[classification[2047-i-TOMAP].first]=classification[i].first;
     }
     //print eviction map
     for(auto it = redirect_lookup.begin(); it != redirect_lookup.end(); it++) {
